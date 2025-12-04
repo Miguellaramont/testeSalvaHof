@@ -1,0 +1,117 @@
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#022a3a; /* azul escuro de fundo */
+}
+.login-wrapper{
+    width:900px;
+    max-width:95%;
+    display:flex;
+    background:#ffffff;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+}
+.login-form{
+    flex:1;
+    padding:40px 50px;
+}
+.login-form h1{
+    font-size:24px;
+    margin-bottom:8px;
+    color:#13293d;
+}
+.login-form p{
+    font-size:14px;
+    color:#6b7280;
+    margin-bottom:24px;
+}
+.form-group{margin-bottom:16px;}
+label{
+    display:block;
+    font-size:13px;
+    margin-bottom:6px;
+    color:#374151;
+}
+input[type="email"],
+input[type="password"]{
+    width:100%;
+    padding:10px 12px;
+    border-radius:6px;
+    border:1px solid #d1d5db;
+    font-size:14px;
+}
+input:focus{
+    outline:none;
+    border-color:#00c485;
+    box-shadow:0 0 0 1px #00c48533;
+}
+button[type="submit"]{
+    width:100%;
+    padding:10px 0;
+    border:none;
+    border-radius:6px;
+    background:#022a3a;
+    color:#ffffff;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:8px;
+}
+button[type="submit"]:hover{background:#011b26;}
+.login-extra{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    font-size:13px;
+}
+.login-extra a{
+    color:#6b7280;
+    text-decoration:none;
+}
+.login-extra a:hover{color:#022a3a;}
+.side-brand{
+    flex:1;
+    background:#00c485; /* verde borda do card */
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.side-inner{
+    width:80%;
+    height:80%;
+    background:#022a3a;
+    border-radius:6px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.logo-mark{
+    width:120px;
+    height:80px;
+    border:4px solid #00c485;
+    border-radius:14px;
+    position:relative;
+}
+.logo-mark::before,
+.logo-mark::after{
+    content:'';
+    position:absolute;
+    background:#00c485;
+    border-radius:999px;
+}
+.logo-mark::before{
+    height:6px;
+    width:70%;
+    top:24px;
+    left:15%;
+}
+.logo-mark::after{
+    height:6px;
+    width:45%;
+    top:44px;
+    left:27%;
+}
+.msg{margin-top:10px;font-size:13px;color:#00c485;}
