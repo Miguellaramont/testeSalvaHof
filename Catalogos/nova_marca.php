@@ -3,14 +3,18 @@ require "../config.php";
 
 $nome = $_POST['nome'];
 $descricao = $_POST['descricao'] ?? null;
-$pais   = $_POST['pais_origem'] ?? null;
+$pais = $_POST['pais_origem'] ?? null;
 $fabricante = $_POST['fabricante'] ?? null;
-$icone = $_POST['icone'] ?? null;
+$logo = $_POST['logo'] ?? null;
 
-$sql = $mysqli->prepare("INSERT INTO marcas (nome, descricao, pais_origem, fabricante) VALUES (?, ?, ?, ?)");
-$sql->bind_param("ssss", $nome, $descricao, $pais, $fabricante);
+$stmt = $mysqli->prepare("
+    INSERT INTO marcas (nome, descricao, pais_origem, fabricante, logo)
+    VALUES (?, ?, ?, ?, ?)
+");
 
-$sql->execute();
+$stmt->bind_param("sssss", $nome, $descricao, $pais, $fabricante, $logo);
 
-header("Location: catalogo_marcas.php?ok=1");
+$stmt->execute();
+
+header("Location: catalogo_marcas.php?msg=Marca cadastrada com sucesso&type=success");
 exit;

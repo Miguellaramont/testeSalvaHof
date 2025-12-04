@@ -1,5 +1,5 @@
 // api.js
-/*console.log();
+console.log();
 
 const url = 'http://temp.api.salvahof.neuroon.top/api/usuarios/v1/login.php';
 
@@ -12,9 +12,14 @@ async function login(email, senha) {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer Re198320@" 
       },
-      body: JSON.stringify({ email, senha })
+      body: JSON.stringify({ 
+        'email': email,
+        'senha': senha
+      })
+
     });
 
     if (!response.ok) {
@@ -37,6 +42,8 @@ botao.addEventListener('click', async (event) => {
   const email = inputEmail.value;
   const senha = inputSenha.value;
 
+  console.log(`email ${email}, senha ${senha}`)
+
   // validação simples
   if (!email || !senha) {
     alert('Preencha email e senha.');
@@ -46,4 +53,3 @@ botao.addEventListener('click', async (event) => {
   const user = await login(email, senha);
   console.log('Retorno da API:', user);
 });
-*/

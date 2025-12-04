@@ -26,57 +26,21 @@ $nome = $_SESSION['user_nome'] ?? 'Usuário';
 
 <body>
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            Salva Hof<br>
-            <span style="font-size:11px;font-weight:400;">Seu varejista</span>
-        </div>
-
-        <div class="sidebar-nav">
-
-            <a href="../Dashboard/dashboard.php">
-                <div class="nav-item"><span>Painel de Controle</span></div>
-            </a>
-            <div class="nav-item"><span>Relatórios</span></div>
-            <div class="nav-item"><span>Extravio</span></div>
-            <div class="nav-item"><span>Vendas</span></div>
-
-            <div class="nav-section-title">Gerenciamento</div>
-            <div class="nav-item"><span>Usuários</span></div>
-            <div class="nav-item"><span>Aplicativo</span></div>
-            <div class="nav-item"><span>Notificações</span></div>
-            <div class="nav-item"><span>Reposição</span></div>
-            <div class="nav-item"><span>Ordens de Serviço</span></div>
-
-            <div class="nav-section-title">Catálogo</div>
-
-            <div class="nav-item open" onclick="toggleSubmenu(this)">
-                <span>Catálogo</span>
-                <span class="arrow">▶</span>
-            </div>
-
-            <div class="submenu" style="max-height:500px;">
-                <a href="catalogo_marcas.php">
-                    <div class="submenu-item">Catálogo de Marcas</div>
-                </a>
-                <a href="catalogo_categorias.php">
-                    <div class="submenu-item active">Catálogo de Categorias</div>
-                </a>
-                <a href="produtos.php">
-                    <div class="submenu-item">Produtos</div>
-                </a>
-            </div>
-
-        </div>
-
-        <div class="sidebar-footer">
-            <div>Logado como: <br><strong><?= htmlspecialchars($nome) ?></strong></div>
-            <div style="margin-top:6px;">
-                <a href="../logout.php" style="color:#fff;text-decoration:none;">Sair</a>
-            </div>
-        </div>
+    <!-- ALERTA DO SISTEMA -->
+    <div class="alert-container" id="alertBox">
+        <div class="alert-message" id="alertMessage"></div>
     </div>
+    <?php if (isset($_GET['msg'])): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                showAlert("<?= $_GET['msg'] ?>", "<?= $_GET['type'] ?? 'success' ?>");
+            });
+        </script>
+    <?php endif; ?>
+
+
+    <!-- SIDEBAR -->
+    <?php include "../Dashboard/sidebar.php"; ?>
 
     <!-- MAIN -->
     <div class="main">
@@ -108,9 +72,9 @@ $nome = $_SESSION['user_nome'] ?? 'Usuário';
 
                             <!-- Ícone -->
                             <?php if ($c['icone']): ?>
-                                <img src="<?= $c['icone'] ?>" alt="ícone">
+                                <img src="<?= $c['icone'] ?>" alt="ícone" width="48" height="48">
                             <?php else: ?>
-                                <img src="https://via.placeholder.com/48" alt="placeholder">
+                                <img src="https://via.placeholder.com/48" alt="categoria" width="48" height="48">
                             <?php endif; ?>
 
                             <!-- Nome -->
@@ -179,6 +143,48 @@ $nome = $_SESSION['user_nome'] ?? 'Usuário';
         </div>
     </div>
 
+    <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO -->
+    <div class="popup-overlay" id="confirmDelete">
+        <div class="popup-content" style="max-width: 380px;">
+
+            <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+
+            <h2>Excluir Categoria</h2>
+            <p>Tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita.</p>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="save-btn" style="background:#e63946;" id="btnConfirmDelete">
+                    Excluir
+                </button>
+
+                <button class="save-btn" style="background:#777;" onclick="closeDeleteModal()">
+                    Cancelar
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO -->
+    <div class="popup-overlay" id="confirmDelete">
+        <div class="popup-content" style="max-width: 380px;">
+
+            <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+
+            <h2>Excluir Categoria</h2>
+            <p>Tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita.</p>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="save-btn" style="background:#e63946;" id="btnConfirmDelete">
+                    Excluir
+                </button>
+
+                <button class="save-btn" style="background:#777;" onclick="closeDeleteModal()">
+                    Cancelar
+                </button>
+            </div>
+
+        </div>
+    </div>
 
     <script>
         function toggleSubmenu(element) {
@@ -216,11 +222,44 @@ $nome = $_SESSION['user_nome'] ?? 'Usuário';
             alert("Abrir modal de edição — ID " + id);
         }
 
+
+        let categoriaParaExcluir = null;
+
         function excluirCategoria(id) {
-            if (confirm("Tem certeza que deseja excluir esta categoria?")) {
-                window.location = "excluir_categoria.php?id=" + id;
-            }
+            categoriaParaExcluir = id;
+            document.getElementById("confirmDelete").style.display = "flex";
         }
+
+        function closeDeleteModal() {
+            categoriaParaExcluir = null;
+            document.getElementById("confirmDelete").style.display = "none";
+        }
+
+        document.getElementById("btnConfirmDelete").onclick = function () {
+            if (categoriaParaExcluir !== null) {
+                window.location = "excluir_categoria.php?id=" + categoriaParaExcluir;
+            }
+        };
+
+
+        function showAlert(msg, type = "success") {
+            const alertBox = document.getElementById("alertBox");
+            const alertMessage = document.getElementById("alertMessage");
+
+            alertMessage.textContent = msg;
+
+            // Estilos
+            alertMessage.className = "alert-message";
+            if (type === "error") alertMessage.classList.add("alert-error");
+            if (type === "warning") alertMessage.classList.add("alert-warning");
+
+            alertBox.style.display = "block";
+
+            setTimeout(() => {
+                alertBox.style.display = "none";
+            }, 3000);
+        }
+
     </script>
 
 </body>

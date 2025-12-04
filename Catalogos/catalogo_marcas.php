@@ -1,87 +1,28 @@
 <?php
 require "../config.php";
 
-// Consulta marcas
 $sql = "SELECT * FROM marcas ORDER BY nome ASC";
 $result = mysqli_query($mysqli, $sql);
 
-// Nome do usuário (usado no topo)
-$nome = $_SESSION['user_nome'] ?? 'Usuário';
+$nome = $_SESSION['user_nome'] ?? "Usuário";
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
 
-    <!-- CSS global da dashboard -->
     <link rel="stylesheet" href="../Dashboard/style.css">
-
-    <!-- CSS específico do catálogo -->
     <link rel="stylesheet" href="catalogo.css">
 
     <title>Catálogo de Marcas</title>
 </head>
 
-
 <body>
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            Salva Hof<br>
-            <span style="font-size:11px;font-weight:400;">Seu varejista</span>
-        </div>
+    <?php include "../Dashboard/sidebar.php"; ?>
 
-        <div class="sidebar-nav">
-
-            <!-- PRINCIPAL -->
-            <a href="../Dashboard/dashboard.php">
-                <div class="nav-item"><span>Painel de Controle</span></div>
-            </a>
-            <div class="nav-item"><span>Relatórios</span></div>
-            <div class="nav-item"><span>Extravio</span></div>
-            <div class="nav-item"><span>Vendas</span></div>
-
-            <!-- GERENCIAMENTO -->
-            <div class="nav-section-title">Gerenciamento</div>
-            <div class="nav-item"><span>Usuários</span></div>
-            <div class="nav-item"><span>Aplicativo</span></div>
-            <div class="nav-item"><span>Notificações</span></div>
-            <div class="nav-item"><span>Reposição</span></div>
-            <div class="nav-item"><span>Ordens de Serviço</span></div>
-
-            <!-- CATÁLOGO / SUBMENU -->
-            <div class="nav-section-title">Catálogo</div>
-
-            <div class="nav-item open" onclick="toggleSubmenu(this)">
-                <span>Catálogo</span>
-                <span class="arrow">▶</span>
-            </div>
-
-            <div class="submenu" style="max-height:500px;"> <!-- Mantém aberto -->
-                <a href="catalogo_marcas.php">
-                    <div class="submenu-item active">Catálogo de Marcas</div>
-                </a>
-                <a href="catalogo_categorias.php">
-                    <div class="submenu-item">Catálogo de Categorias</div>
-                </a>
-                <a href="produtos.php">
-                    <div class="submenu-item">Produtos</div>
-                </a>
-            </div>
-
-        </div>
-
-        <div class="sidebar-footer">
-            <div>Logado como: <br><strong><?= htmlspecialchars($nome) ?></strong></div>
-            <div style="margin-top:6px;">
-                <a href="../logout.php" style="color:#fff;text-decoration:none;">Sair</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- ÁREA PRINCIPAL -->
     <div class="main">
 
         <div class="topbar">
@@ -96,115 +37,167 @@ $nome = $_SESSION['user_nome'] ?? 'Usuário';
 
             <h1>Lista de Marcas</h1>
 
-            <button onclick="openPopup()"
-                style="padding:8px 14px;background:#00c485;color:white;border:none;border-radius:6px;cursor:pointer;">
+            <button class="new-btn" onclick="openModalNovaMarca()">
                 + Nova Marca
             </button>
 
-            <div class="table-wrapper" style="margin-top:20px;">
+            <div class="table-wrapper">
                 <div class="table-title">Marcas Registradas</div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>País Origem</th>
-                            <th>Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="marca-grid">
 
-                        <?php while ($m = mysqli_fetch_assoc($result)): ?>
-                            <tr>
-                                <td><?= $m['id'] ?></td>
-                                <td><?= $m['nome'] ?></td>
-                                <td><?= $m['pais_origem'] ?: "-" ?></td>
-                                <td>
-                                    <span class="action-link">Editar</span>
-                                    <span class="action-link">Excluir</span>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
+                    <?php while ($m = mysqli_fetch_assoc($result)): ?>
 
-                    </tbody>
-                </table>
+                        <div class="marca-card">
 
+                            <!-- Imagem da marca -->
+                            <?php if (!empty($m['logo'])): ?>
+                                <img src="<?= htmlspecialchars($m['logo']) ?>" class="marca-img">
+                            <?php else: ?>
+                                <img src="https://via.placeholder.com/300x200?text=Sem+Logo" class="marca-img">
+                            <?php endif; ?>
+
+                            <!-- Nome da marca -->
+                            <div class="marca-nome"><?= htmlspecialchars($m['nome']) ?></div>
+
+                            <!-- País -->
+                            <div class="marca-desc">
+                                <?= !empty($m["pais_origem"]) ? "Origem: " . htmlspecialchars($m['pais_origem']) : "" ?>
+                            </div>
+
+                            <!-- Ações -->
+                            <div class="marca-actions">
+
+                                <button class="btn-edit"
+                                    onclick="openModalEditarMarca(
+                                        '<?= $m['id'] ?>',
+                                        '<?= addslashes($m['nome']) ?>',
+                                        '<?= addslashes($m['descricao']) ?>',
+                                        '<?= addslashes($m['pais_origem']) ?>',
+                                        '<?= addslashes($m['fabricante']) ?>',
+                                        '<?= addslashes($m['logo']) ?>'
+                                    )">
+                                    Editar
+                                </button>
+
+                                <button class="btn-del" onclick="excluirMarca(<?= $m['id'] ?>);">
+                                    Excluir
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    <?php endwhile; ?>
+
+                </div>
             </div>
-        </div>
 
+        </div>
     </div>
-    <div>
-        <!-- MODAL DE NOVA MARCA -->
-        <div class="popup-overlay" id="popup">
-            <div class="popup-content">
 
-                <button class="close-btn" onclick="closePopup()">&times;</button>
 
-                <h2>Cadastrar Nova Marca</h2>
-                <p>Insira as informações da marca abaixo:</p>
+    <!-- MODAL CADASTRAR / EDITAR MARCA -->
+    <div class="popup-overlay" id="modalMarca">
+        <div class="popup-content">
 
-                <form id="formMarcas" action="nova_marca.php" method="POST">
+            <button class="close-btn" onclick="closeModalMarca()">&times;</button>
 
-                    <!-- Preview opcional de imagem -->
-                    <img id="preview" alt="Pré-visualização" style="display:none;"><br>
+            <h2 id="modalTitle">Cadastrar Nova Marca</h2>
 
-                    <label>URL do ícone da marca (opcional):</label>
-                    <input type="text" name="icone" id="iconeUrl" placeholder="https://exemplo.com/logo.png"
-                        oninput="previewIcon()">
+            <form id="formMarca" method="POST" action="nova_marca.php">
 
-                    <label>Nome da Marca:</label>
-                    <input type="text" name="nome" required placeholder="Ex: Nivea, L'Oréal, Dove">
+                <img id="previewLogo"
+                    style="display:none;width:160px;height:160px;object-fit:contain;margin:10px auto;">
 
-                    <label>Fabricante (opcional):</label>
-                    <input type="text" name="fabricante" placeholder="Ex: Unilever, P&G, Boticário">
+                <label>Logo da Marca (URL):</label>
+                <input type="text" name="logo" id="marcaLogo" placeholder="https://exemplo.com/logo.png"
+                    oninput="previewLogoMarca()">
 
-                    <label>País de Origem (opcional):</label>
-                    <input type="text" name="pais_origem" placeholder="Ex: Brasil, EUA">
+                <label>Nome da Marca:</label>
+                <input type="text" name="nome" id="marcaNome" required placeholder="Ex: OMO, Veja, Heineken">
 
-                    <label>Descrição (opcional):</label>
-                    <textarea name="descricao" rows="4" placeholder="Informações sobre a marca..."
-                        style="width:100%;padding:10px;border:1.5px solid #ccc;border-radius:6px;"></textarea>
+                <label>Descrição (opcional):</label>
+                <textarea name="descricao" id="marcaDescricao" rows="3"></textarea>
 
-                    <button class="save-btn" type="submit">Salvar Marca</button>
-                </form>
+                <label>País de Origem:</label>
+                <input type="text" name="pais_origem" id="marcaPais" placeholder="Ex: Brasil, EUA, Alemanha">
 
-            </div>
+                <label>Fabricante:</label>
+                <input type="text" name="fabricante" id="marcaFabricante" placeholder="Ex: Unilever">
+
+                <input type="hidden" id="marcaId" name="id">
+
+                <button class="save-btn" type="submit">Salvar Marca</button>
+            </form>
+
         </div>
+    </div>
 
-        <!-- SCRIPT DO SUBMENU ANIMADO -->
-        <script>
-            function toggleSubmenu(element) {
-                element.classList.toggle("open");
-                const submenu = element.nextElementSibling;
 
-                if (submenu.style.maxHeight && submenu.style.maxHeight !== "0px") {
-                    submenu.style.maxHeight = "0px";
-                } else {
-                    submenu.style.maxHeight = submenu.scrollHeight + "px";
-                }
+    <script>
+        /* Abrir modal de nova marca */
+        function openModalNovaMarca() {
+            document.getElementById("modalMarca").style.display = "flex";
+
+            document.getElementById("modalTitle").innerText = "Cadastrar Nova Marca";
+            document.getElementById("formMarca").action = "nova_marca.php";
+
+            document.getElementById("marcaId").value = "";
+            document.getElementById("marcaNome").value = "";
+            document.getElementById("marcaLogo").value = "";
+            document.getElementById("marcaDescricao").value = "";
+            document.getElementById("marcaPais").value = "";
+            document.getElementById("marcaFabricante").value = "";
+
+            document.getElementById("previewLogo").style.display = "none";
+        }
+
+        /* Abrir modal de edição */
+        function openModalEditarMarca(id, nome, descricao, pais, fabricante, logo) {
+            document.getElementById("modalMarca").style.display = "flex";
+
+            document.getElementById("modalTitle").innerText = "Editar Marca";
+            document.getElementById("formMarca").action = "editar_marca.php";
+
+            document.getElementById("marcaId").value = id;
+            document.getElementById("marcaNome").value = nome;
+            document.getElementById("marcaDescricao").value = descricao;
+            document.getElementById("marcaPais").value = pais;
+            document.getElementById("marcaFabricante").value = fabricante;
+            document.getElementById("marcaLogo").value = logo;
+
+            if (logo) {
+                document.getElementById("previewLogo").src = logo;
+                document.getElementById("previewLogo").style.display = "block";
             }
+        }
 
-            function openPopup() {
-                document.getElementById("popup").style.display = "flex";
+        /* Fechar modal */
+        function closeModalMarca() {
+            document.getElementById("modalMarca").style.display = "none";
+        }
+
+        /* Preview da imagem */
+        function previewLogoMarca() {
+            const url = marcaLogo.value;
+            const img = previewLogo;
+
+            if (url.length > 5) {
+                img.src = url;
+                img.style.display = "block";
+            } else {
+                img.style.display = "none";
             }
+        }
 
-            function closePopup() {
-                document.getElementById("popup").style.display = "none";
+        /* Excluir marca */
+        function excluirMarca(id) {
+            if (confirm("Deseja realmente excluir esta marca?")) {
+                window.location = "excluir_marca.php?id=" + id;
             }
-
-            function previewIcon() {
-                const url = document.getElementById("iconeUrl").value;
-                const preview = document.getElementById("preview");
-
-                if (url.length > 5) {
-                    preview.src = url;
-                    preview.style.display = "block";
-                } else {
-                    preview.style.display = "none";
-                }
-            }
-        </script>
+        }
+    </script>
 
 </body>
 

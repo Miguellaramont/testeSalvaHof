@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Criar conta</title>
 </head>
 <body>
-<form method="post"action="auth.php">
+<form method="post"action="../auth.php">
     <input type="text" name="nome" placeholder="Nome completo">
     <input type="email" name="email" placeholder="Email">
     <input type="password" name="senha" placeholder="Senha">

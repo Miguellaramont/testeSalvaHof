@@ -36,7 +36,7 @@ unset($_SESSION['msg']);
             <div class="msg"><?= htmlspecialchars($msg) ?></div>
         <?php endif; ?>
 
-        <form method="post" action="auth.php">
+        <form method="post" action="../auth.php">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input id="email" type="email" name="email" required placeholder="seu@email.com">
