@@ -143,6 +143,29 @@ $nome = $_SESSION['user_nome'] ?? 'Usuário';
         </div>
     </div>
 
+    <!-- MODAL EDITAR CATEGORIA -->
+    <div class="popup-overlay" id="popupEditarCategoria">
+        <div class="popup-content">
+            <button class="close-btn" onclick="closePopupEditarCategoria()">&times;</button>
+            <h2>Editar Categoria</h2>
+            <p>Altere as informações abaixo:</p>
+            <form action="editar_categoria.php" method="POST">
+                <input type="hidden" name="id" id="editId">
+                <img id="previewEditIcon"
+                    style="display:none;width:120px;height:120px;object-fit:contain;margin-bottom:15px;">
+                <label>URL do Ícone (opcional):</label>
+                <input type="text" name="icone" id="editIcone" placeholder="https://exemplo.com/icon.png"
+                    oninput="previewEditIcon()">
+                <label>Nome da Categoria:</label>
+                <input type="text" name="nome" id="editNome" required>
+                <label>Descrição (opcional):</label>
+                <textarea name="descricao" id="editDescricao" rows="4"></textarea>
+                <button class="save-btn" type="submit">Salvar Alterações</button>
+            </form>
+        </div>
+    </div>
+
+
     <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO -->
     <div class="popup-overlay" id="confirmDelete">
         <div class="popup-content" style="max-width: 380px;">
@@ -218,11 +241,6 @@ $nome = $_SESSION['user_nome'] ?? 'Usuário';
             }
         }
 
-        function editarCategoria(id) {
-            alert("Abrir modal de edição — ID " + id);
-        }
-
-
         let categoriaParaExcluir = null;
 
         function excluirCategoria(id) {
@@ -258,6 +276,40 @@ $nome = $_SESSION['user_nome'] ?? 'Usuário';
             setTimeout(() => {
                 alertBox.style.display = "none";
             }, 3000);
+        }
+        function editarCategoria(id) {
+            // Buscar dados da categoria via AJAX ou preencher manualmente (exemplo manual)
+            fetch('buscar_categoria.php?id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('editId').value = data.id;
+                    document.getElementById('editIcone').value = data.icone || '';
+                    document.getElementById('editNome').value = data.nome;
+                    document.getElementById('editDescricao').value = data.descricao || '';
+                    if (data.icone) {
+                        document.getElementById('previewEditIcon').src = data.icone;
+                        document.getElementById('previewEditIcon').style.display = 'block';
+                    } else {
+                        document.getElementById('previewEditIcon').style.display = 'none';
+                    }
+                    document.getElementById('popupEditarCategoria').style.display = 'flex';
+                })
+                .catch(error => console.error('Erro ao buscar categoria:', error));
+        }
+
+        function closePopupEditarCategoria() {
+            document.getElementById('popupEditarCategoria').style.display = 'none';
+        }
+
+        function previewEditIcon() {
+            const url = document.getElementById('editIcone').value;
+            const preview = document.getElementById('previewEditIcon');
+            if (url.length > 5) {
+                preview.src = url;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
         }
 
     </script>

@@ -10,7 +10,7 @@ $nome = $_SESSION['user_nome'] ?? "Usuário";
 <div class="sidebar">
 
     <div class="sidebar-header">
-        Salva Hof<br>
+        Salvahof<br>
         <span style="font-size:11px;font-weight:400;">Seu varejista</span>
     </div>
 
@@ -37,7 +37,6 @@ $nome = $_SESSION['user_nome'] ?? "Usuário";
         <div class="nav-item"><span>Ordens de Serviço</span></div>
 
         <!-- CATÁLOGO -->
-        <div class="nav-section-title">Catálogo</div>
 
         <div class="nav-item" onclick="toggleSubmenu(this)">
             <span>Catálogo</span>
